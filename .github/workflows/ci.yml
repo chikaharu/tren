@@ -1,42 +1,36 @@
 name: CI
 
-  on:
-    push:
-      branches: [develop, future, main]
-    pull_request:
-      branches: [develop, future, main]
-    workflow_dispatch:
+on:
+  push:
+    branches: [develop, future, main]
+  pull_request:
+    branches: [develop, future, main]
+  workflow_dispatch:
 
-  env:
-    CARGO_TERM_COLOR: always
+env:
+  CARGO_TERM_COLOR: always
 
-  jobs:
-    test:
-      name: cargo test
-      runs-on: ubuntu-latest
-
-      steps:
-        - name: Checkout
-          uses: actions/checkout@v4
-
-        - name: Install Rust stable
-          uses: dtolnay/rust-toolchain@stable
-
-        - name: Cache cargo registry
-          uses: actions/cache@v4
-          with:
-            path: |
-              ~/.cargo/registry
-              ~/.cargo/git
-              target
-            key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-            restore-keys: |
-              ${{ runner.os }}-cargo-
-
-        - name: Build
-          run: cargo build --all-targets 2>&1
-
-        - name: Run tests
-          run: cargo test --test smoke 2>&1
-          timeout-minutes: 10
-  
+jobs:
+  test:
+    name: cargo test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+      - name: Build
+        run: cargo build --all-targets
+      - name: Run tests
+        run: cargo test --test smoke
+        timeout-minutes: 10
